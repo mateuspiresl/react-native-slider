@@ -188,6 +188,7 @@ export default class Slider extends PureComponent {
     thumbSize: { width: 0, height: 0 },
     allMeasured: false,
     value: new Animated.Value(this.props.value),
+    sliding: false,
   };
 
   componentWillMount() {
@@ -231,6 +232,7 @@ export default class Slider extends PureComponent {
       thumbTouchSize,
       animationType,
       animateTransitions,
+      renderThumb,
       ...other
     } = this.props;
     const {
@@ -288,7 +290,6 @@ export default class Slider extends PureComponent {
         />
         <Animated.View
           onLayout={this._measureThumb}
-          renderToHardwareTextureAndroid
           style={[
             { backgroundColor: thumbTintColor },
             mainStyles.thumb,
@@ -299,7 +300,7 @@ export default class Slider extends PureComponent {
             },
           ]}
         >
-          {this._renderThumbImage()}
+          {this._renderThumb()}
         </Animated.View>
         <View
           renderToHardwareTextureAndroid
@@ -342,6 +343,7 @@ export default class Slider extends PureComponent {
   _handlePanResponderGrant = (/* e: Object, gestureState: Object */) => {
     this._previousLeft = this._getThumbLeft(this._getCurrentValue());
     this._fireChangeEvent('onSlidingStart');
+    this.setState({ sliding: true });
   };
 
   _handlePanResponderMove = (e: Object, gestureState: Object) => {
@@ -365,6 +367,7 @@ export default class Slider extends PureComponent {
 
     this._setCurrentValue(this._getValue(gestureState));
     this._fireChangeEvent('onSlidingComplete');
+    this.setState({ sliding: false });
   };
 
   _measureContainer = (x: Object) => {
@@ -555,6 +558,14 @@ export default class Slider extends PureComponent {
         pointerEvents="none"
       />
     );
+  };
+
+  _renderThumb = () => {
+    const { renderThumb } = this.props;
+    const { sliding } = this.state;
+    return renderThumb
+      ? renderThumb(sliding, this._getCurrentValue())
+      : this._renderThumbImage();
   };
 
   _renderThumbImage = () => {

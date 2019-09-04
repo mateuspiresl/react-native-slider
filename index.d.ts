@@ -86,6 +86,11 @@ declare module 'react-native-slider' {
     onSlidingComplete?: (value: number) => void
 
     /**
+     * Render method for the thumb component.
+     */
+    renderThumb?: (sliding: boolean, value: number) => void
+
+    /**
      * The style applied to the slider container.
      */
     style?: StyleProp<ViewStyle>
